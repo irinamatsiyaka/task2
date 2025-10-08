@@ -1,4 +1,7 @@
-import { calc } from "./calc";
+import React from "react";
+import { createRoot } from "react-dom/client";
+import App from "./App";
+import "./style.css";
 
-console.log("Hello world!");
-console.log(calc(4, 6));
+const root = createRoot(document.getElementById("root"));
+root.render(<App />);
