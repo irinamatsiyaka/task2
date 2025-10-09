@@ -1,8 +1,8 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Login from "./pages/Login";
-import Todos from "./pages/Todos";
-import TodosDetails from "./pages/TodosDetails";
+import Products from "./pages/Products";
+import ProductDetails from "./pages/ProductDetails";
 
 function App() {
    return (
@@ -12,9 +12,9 @@ function App() {
          </nav>
 
          <Routes>
-            <Route path="/" element={<Todos />} />
+            <Route path="/" element={<Products />} />
             <Route path="login" element={<Login />} />
-            <Route path="/todo/:id" element={<TodosDetails />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
          </Routes>
       </BrowserRouter>
    );
