@@ -1,32 +1,20 @@
 import React, { useState } from "react";
 import { Box, TextField, Button, Typography, Paper, Link } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import PropTypes from "prop-types";
 
-function Login({ setUser }) {
+function Register() {
    const [username, setUsername] = useState("");
    const [password, setPassword] = useState("");
    const navigate = useNavigate();
 
-   const handleLogin = () => {
-      const storedUser = JSON.parse(localStorage.getItem("registeredUser"));
-
-      if (!storedUser) {
-         alert("No user found. Please register first.");
-         navigate("/register");
-         return;
-      }
-
-      if (
-         username === storedUser.username &&
-         password === storedUser.password
-      ) {
-         localStorage.setItem("loggedInUser", JSON.stringify(storedUser));
-         setUser(storedUser);
-         alert("Login successful!");
-         navigate("/");
+   const handleRegister = () => {
+      if (username.trim() && password.trim()) {
+         const user = { username, password };
+         localStorage.setItem("registeredUser", JSON.stringify(user));
+         alert("successful!");
+         navigate("/login");
       } else {
-         alert("Invalid username or password");
+         alert("fill in all fields");
       }
    };
 
@@ -49,7 +37,7 @@ function Login({ setUser }) {
             }}
          >
             <Typography variant="h5" gutterBottom>
-               Login
+               Register
             </Typography>
 
             <TextField
@@ -60,6 +48,7 @@ function Login({ setUser }) {
                onChange={(e) => setUsername(e.target.value)}
                sx={{ mb: 2 }}
             />
+
             <TextField
                label="Password"
                type="password"
@@ -74,20 +63,20 @@ function Login({ setUser }) {
                variant="contained"
                color="primary"
                fullWidth
-               onClick={handleLogin}
+               onClick={handleRegister}
             >
-               Login
+               Register
             </Button>
 
             <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-               Don’t have an account?{" "}
+               Already have an account?{" "}
                <Link
                   component="button"
                   variant="body2"
                   sx={{ color: "gray", textDecoration: "underline" }}
-                  onClick={() => navigate("/register")}
+                  onClick={() => navigate("/login")}
                >
-                  Register
+                  Login
                </Link>
             </Typography>
          </Paper>
@@ -95,8 +84,4 @@ function Login({ setUser }) {
    );
 }
 
-Login.propTypes = {
-   setUser: PropTypes.func.isRequired,
-};
-
-export default Login;
+export default Register;
