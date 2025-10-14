@@ -2,43 +2,69 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 
-module.exports = {
-   entry: "./src/index.js",
-   output: {
-      path: path.resolve(__dirname, "dist"),
-      filename: "bundle.js",
-      clean: true,
-   },
-   mode: "development",
-   devServer: {
-      static: "./dist",
-      port: 3002,
-      open: true,
-      hot: true,
-   },
-   plugins: [
-      new HtmlWebpackPlugin({
-         template: "./public/index.html",
-      }),
-      new ReactRefreshWebpackPlugin(),
-   ],
-   module: {
-      rules: [
-         { test: /\.css$/, use: ["style-loader", "css-loader"] },
+module.exports = (env, argv) => {
+   const isDev = argv.mode === "development";
 
-         {
-            test: /\.jsx?$/,
-            exclude: /node_modules/,
-            use: {
-               loader: "babel-loader",
-               options: {
-                  plugins: [require.resolve("react-refresh/babel")],
+   return {
+      entry: "./src/index.js",
+      output: {
+         path: path.resolve(__dirname, "dist"),
+         filename: isDev ? "bundle.js" : "bundle.[contenthash].js",
+         clean: true,
+         publicPath: "",
+      },
+      mode: isDev ? "development" : "production",
+
+      devServer: isDev
+         ? {
+              static: "./dist",
+              port: 3002,
+              open: true,
+              hot: true,
+           }
+         : undefined,
+
+      plugins: [
+         new HtmlWebpackPlugin({
+            template: "./public/index.html",
+            minify: isDev
+               ? false
+               : {
+                    collapseWhitespace: true,
+                    removeComments: true,
+                    removeRedundantAttributes: true,
+                    useShortDoctype: true,
+                 },
+         }),
+         ...(isDev ? [new ReactRefreshWebpackPlugin()] : []),
+      ],
+      module: {
+         rules: [
+            { test: /\.css$/, use: ["style-loader", "css-loader"] },
+
+            {
+               test: /\.jsx?$/,
+               exclude: /node_modules/,
+               use: {
+                  loader: "babel-loader",
+                  options: {
+                     plugins: isDev
+                        ? [require.resolve("react-refresh/babel")]
+                        : [],
+                  },
                },
             },
-         },
-      ],
-   },
-   resolve: {
-      extensions: [".js", ".jsx"],
-   },
+         ],
+      },
+      resolve: {
+         extensions: [".js", ".jsx"],
+      },
+
+      optimization: isDev
+         ? undefined
+         : {
+              splitChunks: { chunks: "all" },
+              minimize: true, // минификация JS
+           },
+   };
 };
