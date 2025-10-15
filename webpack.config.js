@@ -64,7 +64,7 @@ module.exports = (env, argv) => {
          ? undefined
          : {
               splitChunks: { chunks: "all" },
-              minimize: true, // минификация JS
+              minimize: true,
            },
    };
 };

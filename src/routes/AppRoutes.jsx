@@ -16,7 +16,10 @@ function AppRoutes({ setCartCount, user, setUser }) {
          />
          <Route path="/login" element={<Login setUser={setUser} />} />
          <Route path="/register" element={<Register />} />
-         <Route path="/product/:id" element={<ProductDetails />} />
+         <Route
+            path="/product/:id"
+            element={<ProductDetails setCartCount={setCartCount} user={user} />}
+         />
          <Route
             path="/cart"
             element={<Cart setCartCount={setCartCount} user={user} />}

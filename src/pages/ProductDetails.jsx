@@ -13,8 +13,9 @@ import {
 } from "@mui/material";
 import GradientCircularProgress from "../components/GradientCircularProgress";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import PropTypes from "prop-types";
 
-function ProductDetails() {
+function ProductDetails({ setCartCount = () => {}, user = null }) {
    const { id } = useParams();
    const { data, isLoading, error } = useGetProductByIdQuery(id);
 
@@ -26,6 +27,36 @@ function ProductDetails() {
       );
    if (error)
       return <Typography color="error">Error loading product</Typography>;
+
+   const handleAddToCart = (event, product) => {
+      event.preventDefault();
+      if (!user) {
+         alert("u should login");
+         return;
+      }
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const existingItem = cart.some((item) => item.id === product.id);
+
+      let updatedCart;
+      if (existingItem) {
+         updatedCart = cart.map((item) =>
+            item.id === product.id
+               ? { ...item, quatity: item.quatity + 1 }
+               : item
+         );
+      } else {
+         updatedCart = [...cart, { ...product, quatity: 1 }];
+      }
+
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+
+      const totalItems = updatedCart.reduce(
+         (sum, item) => sum + item.quatity,
+         0
+      );
+
+      setCartCount(totalItems);
+   };
 
    return (
       <Box
@@ -57,7 +88,11 @@ function ProductDetails() {
                   backgroundColor: "white",
                   "&:hover": { backgroundColor: "#f5f5f5" },
                }}
-               onClick={() => alert(`Added "${data.title}" to cart`)}
+               onClick={(event) => {
+                  event.preventDefault();
+
+                  handleAddToCart(event, data);
+               }}
             >
                <ShoppingCartIcon sx={{ color: "#1976d2" }} />
             </IconButton>
@@ -86,5 +121,10 @@ function ProductDetails() {
       </Box>
    );
 }
+
+ProductDetails.propTypes = {
+   setCartCount: PropTypes.func.isRequired,
+   user: PropTypes.object,
+};
 
 export default ProductDetails;

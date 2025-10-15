@@ -9,7 +9,8 @@ import {
    Button,
    Grid,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 import PropTypes from "prop-types";
 
 function Cart({ setCartCount = () => {} }) {
@@ -26,15 +27,22 @@ function Cart({ setCartCount = () => {} }) {
       setCartCount(total);
    }, [cartItems, setCartCount]);
 
-   const handleRemove = (id) => {
-      const updatedCart = cartItems
+   const handleIncrease = (id) => {
+      const updated = cartItems.map((item) =>
+         item.id === id ? { ...item, quatity: item.quatity + 1 } : item
+      );
+      setCartItems(updated);
+      localStorage.setItem("cart", JSON.stringify(updated));
+   };
+
+   const handleDecrease = (id) => {
+      const updated = cartItems
          .map((item) =>
             item.id === id ? { ...item, quatity: item.quatity - 1 } : item
          )
          .filter((item) => item.quatity > 0);
-
-      setCartItems(updatedCart);
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      setCartItems(updated);
+      localStorage.setItem("cart", JSON.stringify(updated));
    };
 
    const handleClearCart = () => {
@@ -89,26 +97,43 @@ function Cart({ setCartCount = () => {} }) {
                         alt={item.title}
                         sx={{ height: 200, objectFit: "cover" }}
                      />
-                     <CardContent>
+                     <CardContent sx={{ textAlign: "center" }}>
                         <Typography variant="h6">{item.title}</Typography>
                         <Typography color="text.secondary">
                            Price: ${item.price}
                         </Typography>
-                        <Typography color="text.secondary">
-                           Quantity: {item.quatity}
-                        </Typography>
+
+                        <Box
+                           sx={{
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              mt: 1,
+                           }}
+                        >
+                           <IconButton
+                              color="primary"
+                              onClick={() => handleDecrease(item.id)}
+                           >
+                              <RemoveIcon />
+                           </IconButton>
+
+                           <Typography sx={{ mx: 2 }}>
+                              {item.quatity}
+                           </Typography>
+
+                           <IconButton
+                              color="primary"
+                              onClick={() => handleIncrease(item.id)}
+                           >
+                              <AddIcon />
+                           </IconButton>
+                        </Box>
+
                         <Typography color="text.primary" sx={{ mt: 1 }}>
                            Total: ${(item.price * item.quatity).toFixed(2)}
                         </Typography>
                      </CardContent>
-
-                     <IconButton
-                        color="error"
-                        onClick={() => handleRemove(item.id)}
-                        sx={{ alignSelf: "flex-end", m: 1 }}
-                     >
-                        <DeleteIcon />
-                     </IconButton>
                   </Card>
                </Grid>
             ))}
