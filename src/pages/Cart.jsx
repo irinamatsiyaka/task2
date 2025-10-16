@@ -83,9 +83,11 @@ function Cart({ setCartCount = () => {} }) {
 
          <Grid container spacing={3} justifyContent="center">
             {cartItems.map((item) => (
-               <Grid item xs={12} sm={6} md={4} key={item.id}>
+               <Grid key={item.id}>
                   <Card
                      sx={{
+                        width: 300,
+                        aspectRatio: "3 / 5",
                         display: "flex",
                         flexDirection: "column",
                         boxShadow: 3,
@@ -95,7 +97,11 @@ function Cart({ setCartCount = () => {} }) {
                         component="img"
                         image={item.thumbnail}
                         alt={item.title}
-                        sx={{ height: 200, objectFit: "cover" }}
+                        sx={{
+                           height: "100%",
+                           width: "100%",
+                           objectFit: "cover",
+                        }}
                      />
                      <CardContent sx={{ textAlign: "center" }}>
                         <Typography variant="h6">{item.title}</Typography>
