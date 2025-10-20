@@ -43,11 +43,16 @@ module.exports = (env, argv) => {
             { test: /\.css$/, use: ["style-loader", "css-loader"] },
 
             {
-               test: /\.jsx?$/,
+               test: /\.[jt]sx?$/,
                exclude: /node_modules/,
                use: {
                   loader: "babel-loader",
                   options: {
+                     presets: [
+                        "@babel/preset-env",
+                        "@babel/preset-react",
+                        "@babel/preset-typescript",
+                     ],
                      plugins: isDev
                         ? [require.resolve("react-refresh/babel")]
                         : [],
@@ -57,7 +62,7 @@ module.exports = (env, argv) => {
          ],
       },
       resolve: {
-         extensions: [".js", ".jsx"],
+         extensions: [".ts", ".tsx", ".js", ".jsx"],
       },
 
       optimization: isDev

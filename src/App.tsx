@@ -11,26 +11,40 @@ import {
 } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import AppRoutes from "./routes/AppRoutes";
+import User from "./types/user";
 
-function App() {
-   const [cartCount, setCartCount] = useState(0);
-   const [user, setUser] = useState(null);
+function App(): JSX.Element {
+   const [cartCount, setCartCount] = useState<number>(0);
+   const [user, setUser] = useState<User | null>(null);
+
+   const getCartKey = (user: User | null): string => {
+      return user ? `cart_user_${user.id}` : "cart_guest";
+   };
 
    useEffect(() => {
       const storedUser = JSON.parse(localStorage.getItem("loggedInUser"));
-      const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
+      const savedCart =
+         JSON.parse(localStorage.getItem(getCartKey(storedUser))) || [];
       if (storedUser) setUser(storedUser);
       setCartCount(savedCart.length);
    }, []);
 
    useEffect(() => {
-      const currentCart = JSON.parse(localStorage.getItem("cart")) || [];
-      if (cartCount !== currentCart.length) {
-         localStorage.setItem("cart", JSON.stringify(currentCart));
+      if (!user) {
+         const guestCart = JSON.parse(
+            localStorage.getItem("cart_guest") || "[]"
+         );
+         setCartCount(guestCart.length);
+         return;
       }
-   }, [cartCount]);
 
-   const handleLogout = () => {
+      const savedCart = JSON.parse(
+         localStorage.getItem(`cart_user_${user.id}`) || "[]"
+      );
+      setCartCount(savedCart.length);
+   }, [user]);
+
+   const handleLogout = (): void => {
       localStorage.removeItem("loggedInUser");
       setUser(null);
       setCartCount(0);

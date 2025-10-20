@@ -3,42 +3,39 @@ import { Box, TextField, Button, Typography, Paper, Link } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useSnackbar } from "notistack";
+import type { User } from "../types/user";
 
-function LoginForm({ setUser }) {
+type LoginFormProps = {
+   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+};
+function LoginForm({ setUser }: LoginFormProps): JSX.Element {
    const [username, setUsername] = useState("");
    const [password, setPassword] = useState("");
    const navigate = useNavigate();
 
    const { enqueueSnackbar } = useSnackbar();
 
-   const handleLogin = () => {
-      const storedUser = JSON.parse(localStorage.getItem("registeredUser"));
+   const handleLogin = (): void => {
+      const users = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
+
+      const storedUser = users.find(
+         (u: { username: string; password: string }) =>
+            u.username === username && u.password === password
+      );
 
       if (!storedUser) {
-         enqueueSnackbar("No user found. Please register first.", {
-            variant: "warning",
-         });
-         navigate("/register");
+         enqueueSnackbar("Invalid username or password", { variant: "error" });
          return;
       }
 
-      if (
-         username === storedUser.username &&
-         password === storedUser.password
-      ) {
-         localStorage.setItem("loggedInUser", JSON.stringify(storedUser));
-         setUser(storedUser);
-         enqueueSnackbar("Login successful!", {
-            variant: "success",
-         });
-         setTimeout(() => {
-            navigate("/");
-         }, 1500);
-         return;
-      }
-      enqueueSnackbar("Invalid username or password", {
-         variant: "error",
-      });
+      localStorage.setItem("loggedInUser", JSON.stringify(storedUser));
+      setUser(storedUser);
+
+      enqueueSnackbar("Login successful!", { variant: "success" });
+
+      setTimeout(() => {
+         navigate("/");
+      }, 1500);
    };
 
    return (
@@ -68,7 +65,7 @@ function LoginForm({ setUser }) {
                variant="outlined"
                fullWidth
                value={username}
-               onChange={(e) => setUsername(e.target.value)}
+               onChange={(e: string) => setUsername(e.target.value)}
                sx={{ mb: 2 }}
             />
             <TextField
@@ -77,7 +74,7 @@ function LoginForm({ setUser }) {
                variant="outlined"
                fullWidth
                value={password}
-               onChange={(e) => setPassword(e.target.value)}
+               onChange={(e: string) => setPassword(e.target.value)}
                sx={{ mb: 3 }}
             />
 

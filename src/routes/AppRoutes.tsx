@@ -6,8 +6,19 @@ import ProductDetails from "../pages/ProductDetails";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Cart from "../pages/Cart";
+import type { User } from "../types/user";
 
-function AppRoutes({ setCartCount, user, setUser }) {
+type AppRoutesProps = {
+   setCartCount: React.Dispatch<React.SetStateAction<number>>;
+   user: User | null;
+   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+};
+
+function AppRoutes({
+   setCartCount,
+   user,
+   setUser,
+}: AppRoutesProps): JSX.Element {
    return (
       <Routes>
          <Route

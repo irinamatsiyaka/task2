@@ -17,12 +17,25 @@ import {
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PropTypes from "prop-types";
 import { useSnackbar } from "notistack";
+import type { Product } from "../types/product";
+import type { User } from "../types/user";
 
-function ProductsContent({ setCartCount = () => {}, user = null }) {
+type ProductsContentProps = {
+   setCartCount: React.Dispatch<React.SetStateAction<number>>;
+   user: User | null;
+};
+
+function ProductsContent({
+   setCartCount,
+   user,
+}: ProductsContentProps): JSX.Element {
    const { data = { products: [] }, isLoading, error } = useGetProductsQuery();
    const { enqueueSnackbar } = useSnackbar();
 
-   const handleAddToCart = (event, product) => {
+   const handleAddToCart = (
+      event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>,
+      product: Product
+   ): void => {
       event.preventDefault();
       if (!user) {
          enqueueSnackbar("Please login to add products to cart", {
@@ -30,12 +43,14 @@ function ProductsContent({ setCartCount = () => {}, user = null }) {
          });
          return;
       }
-      const cart = JSON.parse(localStorage.getItem("cart")) || [];
-      const existingItem = cart.some((item) => item.id === product.id);
+
+      const cartKey = `cart_user_${user.id}`;
+      const cart = JSON.parse(localStorage.getItem(cartKey) || "[]");
+      const existingItem = cart.find((item: Product) => item.id === product.id);
 
       let updatedCart;
       if (existingItem) {
-         updatedCart = cart.map((item) =>
+         updatedCart = cart.map((item: Product) =>
             item.id === product.id
                ? { ...item, quatity: item.quatity + 1 }
                : item
@@ -44,10 +59,10 @@ function ProductsContent({ setCartCount = () => {}, user = null }) {
          updatedCart = [...cart, { ...product, quatity: 1 }];
       }
 
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      localStorage.setItem(cartKey, JSON.stringify(updatedCart));
 
       const totalItems = updatedCart.reduce(
-         (sum, item) => sum + item.quatity,
+         (sum: number, item: Product) => sum + item.quatity,
          0
       );
 
@@ -61,7 +76,7 @@ function ProductsContent({ setCartCount = () => {}, user = null }) {
                Loading products...
             </Typography>
             <Grid container spacing={3} justifyContent="center">
-               {Array.from(new Array(8)).map((_, index) => (
+               {Array.from(new Array(8)).map((_: undefined, index: number) => (
                   <Grid key={index}>
                      <Card
                         sx={{
@@ -100,7 +115,7 @@ function ProductsContent({ setCartCount = () => {}, user = null }) {
             justifyContent="center"
             alignItems="center"
          >
-            {data.products.map((product) => (
+            {data.products.map((product: Product) => (
                <Grid key={product.id}>
                   <Card
                      component={Link}
@@ -124,7 +139,11 @@ function ProductsContent({ setCartCount = () => {}, user = null }) {
                            backgroundColor: "white",
                            "&:hover": { backgroundColor: "#f5f5f5" },
                         }}
-                        onClick={(event) => {
+                        onClick={(
+                           event: React.MouseEvent<
+                              HTMLButtonElement | HTMLAnchorElement
+                           >
+                        ) => {
                            event.preventDefault();
 
                            handleAddToCart(event, product);

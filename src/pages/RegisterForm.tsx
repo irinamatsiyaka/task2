@@ -3,17 +3,36 @@ import { Box, TextField, Button, Typography, Paper, Link } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 
-function RegisterForm() {
+function RegisterForm(): JSX.Element {
    const [username, setUsername] = useState("");
    const [password, setPassword] = useState("");
    const navigate = useNavigate();
 
    const { enqueueSnackbar } = useSnackbar();
 
-   const handleRegister = () => {
+   const handleRegister = (): void => {
       if (username.trim() && password.trim()) {
-         const user = { username, password };
-         localStorage.setItem("registeredUser", JSON.stringify(user));
+         const users = JSON.parse(
+            localStorage.getItem("registeredUsers") || "[]"
+         );
+
+         const existingUser = users.find(
+            (u: { username: string }) => u.username === username
+         );
+         if (existingUser) {
+            enqueueSnackbar("This username is already taken!", {
+               variant: "error",
+            });
+            return;
+         }
+
+         const newUser = {
+            id: users.length + 1,
+            username,
+            password,
+         };
+         const updatedUsers = [...users, newUser];
+         localStorage.setItem("registeredUsers", JSON.stringify(updatedUsers));
          enqueueSnackbar("Registration successful!", { variant: "success" });
 
          setTimeout(() => {
@@ -51,7 +70,9 @@ function RegisterForm() {
                variant="outlined"
                fullWidth
                value={username}
-               onChange={(e) => setUsername(e.target.value)}
+               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                  setUsername(event.target.value)
+               }
                sx={{ mb: 2 }}
             />
 
@@ -61,7 +82,9 @@ function RegisterForm() {
                variant="outlined"
                fullWidth
                value={password}
-               onChange={(e) => setPassword(e.target.value)}
+               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                  setPassword(event.target.value)
+               }
                sx={{ mb: 3 }}
             />
 

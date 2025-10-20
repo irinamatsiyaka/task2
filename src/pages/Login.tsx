@@ -1,9 +1,14 @@
 import React from "react";
 import { SnackbarProvider } from "notistack";
 import LoginForm from "./LoginForm";
-import PropTypes from "prop-types";
 
-export default function Login({ setUser }) {
+import type { User } from "../types/user";
+
+type LoginProps = {
+   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+};
+
+export default function Login({ setUser }: LoginProps): JSX.Element {
    return (
       <SnackbarProvider
          maxSnack={3}
@@ -14,7 +19,3 @@ export default function Login({ setUser }) {
       </SnackbarProvider>
    );
 }
-
-Login.propTypes = {
-   setUser: PropTypes.func.isRequired,
-};

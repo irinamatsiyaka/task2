@@ -11,47 +11,60 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import PropTypes from "prop-types";
+import type { CartItem, CartProps } from "../types/cart";
+import type { User } from "../types/user";
 
-function Cart({ setCartCount = () => {} }) {
+export type CartProps = {
+   setCartCount: React.Dispatch<React.SetStateAction<number>>;
+   user: User | null;
+};
+
+function Cart({ setCartCount, user }: CartProps): JSX.Element {
    const [cartItems, setCartItems] = useState([]);
 
-   useEffect(() => {
-      const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
-      setCartItems(savedCart);
-   }, []);
+   const getCartKey = (): string => {
+      return user ? `cart_user_${user.id}` : "cart_guest";
+   };
 
    useEffect(() => {
-      localStorage.setItem("cart", JSON.stringify(cartItems));
-      const total = cartItems.reduce((sum, item) => sum + item.quatity, 0);
+      const savedCart = JSON.parse(localStorage.getItem(getCartKey())) || [];
+      setCartItems(savedCart);
+   }, [user]);
+
+   useEffect(() => {
+      localStorage.setItem(getCartKey(), JSON.stringify(cartItems));
+      const total = cartItems.reduce(
+         (sum: number, item: CartItem) => sum + item.quatity,
+         0
+      );
       setCartCount(total);
    }, [cartItems, setCartCount]);
 
-   const handleIncrease = (id) => {
-      const updated = cartItems.map((item) =>
+   const handleIncrease = (id: number): void => {
+      const updated = cartItems.map((item: number) =>
          item.id === id ? { ...item, quatity: item.quatity + 1 } : item
       );
       setCartItems(updated);
-      localStorage.setItem("cart", JSON.stringify(updated));
+      localStorage.setItem(getCartKey(), JSON.stringify(updated));
    };
 
-   const handleDecrease = (id) => {
+   const handleDecrease = (id: number): void => {
       const updated = cartItems
-         .map((item) =>
+         .map((item: CartItem) =>
             item.id === id ? { ...item, quatity: item.quatity - 1 } : item
          )
-         .filter((item) => item.quatity > 0);
+         .filter((item: number) => item.quatity > 0);
       setCartItems(updated);
-      localStorage.setItem("cart", JSON.stringify(updated));
+      localStorage.setItem(getCartKey(), JSON.stringify(updated));
    };
 
-   const handleClearCart = () => {
+   const handleClearCart = (): void => {
       setCartItems([]);
-      localStorage.removeItem("cart");
+      localStorage.removeItem(getCartKey());
    };
 
    const totalPrice = cartItems.reduce(
-      (sum, item) => sum + item.price * item.quatity,
+      (sum: number, item: CartItem) => sum + item.price * item.quatity,
       0
    );
 
@@ -82,7 +95,7 @@ function Cart({ setCartCount = () => {} }) {
          </Typography>
 
          <Grid container spacing={3} justifyContent="center">
-            {cartItems.map((item) => (
+            {cartItems.map((item: CartItem) => (
                <Grid key={item.id}>
                   <Card
                      sx={{
@@ -161,9 +174,5 @@ function Cart({ setCartCount = () => {} }) {
       </Box>
    );
 }
-
-Cart.propTypes = {
-   setCartCount: PropTypes.func.isRequired,
-};
 
 export default Cart;

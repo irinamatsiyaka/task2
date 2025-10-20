@@ -13,10 +13,19 @@ import {
 } from "@mui/material";
 import GradientCircularProgress from "../components/GradientCircularProgress";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import PropTypes from "prop-types";
 import { useSnackbar } from "notistack";
+import type { Product } from "../types/product";
+import type { User } from "../types/user";
 
-function ProductDetailsContent({ setCartCount = () => {}, user = null }) {
+type ProductDetailsContentProps = {
+   setCartCount: React.Dispatch<React.SetStateAction<number>>;
+   user: User | null;
+};
+
+function ProductDetailsContent({
+   setCartCount,
+   user,
+}: ProductDetailsContentProps): JSX.Element {
    const { id } = useParams();
    const { data, isLoading, error } = useGetProductByIdQuery(id);
    const { enqueueSnackbar } = useSnackbar();
@@ -30,7 +39,10 @@ function ProductDetailsContent({ setCartCount = () => {}, user = null }) {
    if (error)
       return <Typography color="error">Error loading product</Typography>;
 
-   const handleAddToCart = (event, product) => {
+   const handleAddToCart = (
+      event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>,
+      product: Product
+   ): void => {
       event.preventDefault();
       if (!user) {
          enqueueSnackbar("Please login to add products to cart", {
@@ -38,12 +50,13 @@ function ProductDetailsContent({ setCartCount = () => {}, user = null }) {
          });
          return;
       }
-      const cart = JSON.parse(localStorage.getItem("cart")) || [];
-      const existingItem = cart.some((item) => item.id === product.id);
+      const cartKey = `cart_user_${user.id}`;
+      const cart = JSON.parse(localStorage.getItem(cartKey) || "[]");
+      const existingItem = cart.some((item: Product) => item.id === product.id);
 
       let updatedCart;
       if (existingItem) {
-         updatedCart = cart.map((item) =>
+         updatedCart = cart.map((item: Product) =>
             item.id === product.id
                ? { ...item, quatity: item.quatity + 1 }
                : item
@@ -52,10 +65,10 @@ function ProductDetailsContent({ setCartCount = () => {}, user = null }) {
          updatedCart = [...cart, { ...product, quatity: 1 }];
       }
 
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      localStorage.setItem(cartKey, JSON.stringify(updatedCart));
 
       const totalItems = updatedCart.reduce(
-         (sum, item) => sum + item.quatity,
+         (sum: number, item: Product) => sum + item.quatity,
          0
       );
 
@@ -92,7 +105,9 @@ function ProductDetailsContent({ setCartCount = () => {}, user = null }) {
                   backgroundColor: "white",
                   "&:hover": { backgroundColor: "#f5f5f5" },
                }}
-               onClick={(event) => {
+               onClick={(
+                  event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
+               ) => {
                   event.preventDefault();
 
                   handleAddToCart(event, data);
@@ -125,10 +140,5 @@ function ProductDetailsContent({ setCartCount = () => {}, user = null }) {
       </Box>
    );
 }
-
-ProductDetailsContent.propTypes = {
-   setCartCount: PropTypes.func.isRequired,
-   user: PropTypes.object,
-};
 
 export default ProductDetailsContent;

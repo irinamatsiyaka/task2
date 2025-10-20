@@ -1,17 +1,16 @@
 import React from "react";
 import { SnackbarProvider } from "notistack";
-import ProductsContent from "./ProductsContent";
+import RegisterForm from "./RegisterForm";
 
-function Products(props) {
+function Register(): JSX.Element {
    return (
       <SnackbarProvider
          maxSnack={3}
          anchorOrigin={{ vertical: "top", horizontal: "center" }}
-         autoHideDuration={2000}
       >
-         <ProductsContent {...props} />
+         <RegisterForm />
       </SnackbarProvider>
    );
 }
 
-export default Products;
+export default Register;
