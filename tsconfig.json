@@ -23,9 +23,9 @@
       "removeComments": true,
 
       "noUncheckedIndexedAccess": true,
-      "exactOptionalPropertyTypes": true,
-      "allowJs": true,
-      "checkJs": true
+      "exactOptionalPropertyTypes": true
+      // "allowJs": true,
+      // "checkJs": true
    },
    "include": ["src"],
    "exclude": ["node_modules"]

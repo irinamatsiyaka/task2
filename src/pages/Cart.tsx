@@ -11,49 +11,54 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import type { CartItem, CartProps } from "../types/cart";
 import type { User } from "../types/user";
+import type { Product } from "../types/product";
+
+export type ProductInCart = Product & {
+   quatity: number;
+};
 
 export type CartProps = {
    setCartCount: React.Dispatch<React.SetStateAction<number>>;
    user: User | null;
 };
 
-function Cart({ setCartCount, user }: CartProps): JSX.Element {
-   const [cartItems, setCartItems] = useState([]);
+function Cart({ setCartCount, user }: CartProps): React.JSX.Element {
+   const [cartItems, setCartItems] = useState<ProductInCart[]>([]);
 
    const getCartKey = (): string => {
       return user ? `cart_user_${user.id}` : "cart_guest";
    };
 
    useEffect(() => {
-      const savedCart = JSON.parse(localStorage.getItem(getCartKey())) || [];
+      const savedCart = JSON.parse(localStorage.getItem(getCartKey()) || "[]");
       setCartItems(savedCart);
    }, [user]);
 
    useEffect(() => {
       localStorage.setItem(getCartKey(), JSON.stringify(cartItems));
       const total = cartItems.reduce(
-         (sum: number, item: CartItem) => sum + item.quatity,
+         (sum: number, item: ProductInCart) => sum + item.quatity,
          0
       );
       setCartCount(total);
    }, [cartItems, setCartCount]);
 
    const handleIncrease = (id: number): void => {
-      const updated = cartItems.map((item: number) =>
+      const updated = cartItems.map((item: ProductInCart) =>
          item.id === id ? { ...item, quatity: item.quatity + 1 } : item
       );
+
       setCartItems(updated);
       localStorage.setItem(getCartKey(), JSON.stringify(updated));
    };
 
    const handleDecrease = (id: number): void => {
       const updated = cartItems
-         .map((item: CartItem) =>
+         .map((item: ProductInCart) =>
             item.id === id ? { ...item, quatity: item.quatity - 1 } : item
          )
-         .filter((item: number) => item.quatity > 0);
+         .filter((item: ProductInCart) => item.quatity > 0);
       setCartItems(updated);
       localStorage.setItem(getCartKey(), JSON.stringify(updated));
    };
@@ -64,7 +69,7 @@ function Cart({ setCartCount, user }: CartProps): JSX.Element {
    };
 
    const totalPrice = cartItems.reduce(
-      (sum: number, item: CartItem) => sum + item.price * item.quatity,
+      (sum: number, item: ProductInCart) => sum + item.price * item.quatity,
       0
    );
 
@@ -95,7 +100,7 @@ function Cart({ setCartCount, user }: CartProps): JSX.Element {
          </Typography>
 
          <Grid container spacing={3} justifyContent="center">
-            {cartItems.map((item: CartItem) => (
+            {cartItems.map((item: ProductInCart) => (
                <Grid key={item.id}>
                   <Card
                      sx={{

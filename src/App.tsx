@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import AppRoutes from "./routes/AppRoutes";
-import User from "./types/user";
+import type { User } from "./types/user";
 
 function App(): JSX.Element {
    const [cartCount, setCartCount] = useState<number>(0);

@@ -7,7 +7,7 @@ type ProductsProps = {
    setCartCount: React.Dispatch<React.SetStateAction<number>>;
    user: User | null;
 };
-function Products({ setCartCount, user }: ProductsProps): JSX.Element {
+function Products({ setCartCount, user }: ProductsProps): React.JSX.Element {
    return (
       <SnackbarProvider
          maxSnack={3}

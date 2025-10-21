@@ -22,12 +22,16 @@ type ProductDetailsContentProps = {
    user: User | null;
 };
 
+export type ProductInCart = Product & {
+   quatity: number;
+};
+
 function ProductDetailsContent({
    setCartCount,
    user,
-}: ProductDetailsContentProps): JSX.Element {
-   const { id } = useParams();
-   const { data, isLoading, error } = useGetProductByIdQuery(id);
+}: ProductDetailsContentProps): React.JSX.Element {
+   const { id } = useParams<{ id: string }>();
+   const { data, isLoading, error } = useGetProductByIdQuery(id ?? "");
    const { enqueueSnackbar } = useSnackbar();
 
    if (isLoading)
@@ -52,11 +56,13 @@ function ProductDetailsContent({
       }
       const cartKey = `cart_user_${user.id}`;
       const cart = JSON.parse(localStorage.getItem(cartKey) || "[]");
-      const existingItem = cart.some((item: Product) => item.id === product.id);
+      const existingItem = cart.some(
+         (item: ProductInCart) => item.id === product.id
+      );
 
       let updatedCart;
       if (existingItem) {
-         updatedCart = cart.map((item: Product) =>
+         updatedCart = cart.map((item: ProductInCart) =>
             item.id === product.id
                ? { ...item, quatity: item.quatity + 1 }
                : item
@@ -68,7 +74,7 @@ function ProductDetailsContent({
       localStorage.setItem(cartKey, JSON.stringify(updatedCart));
 
       const totalItems = updatedCart.reduce(
-         (sum: number, item: Product) => sum + item.quatity,
+         (sum: number, item: ProductInCart) => sum + item.quatity,
          0
       );
 
@@ -109,7 +115,7 @@ function ProductDetailsContent({
                   event: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
                ) => {
                   event.preventDefault();
-
+                  if (!data) return;
                   handleAddToCart(event, data);
                }}
             >
@@ -117,23 +123,24 @@ function ProductDetailsContent({
             </IconButton>
             <CardMedia
                component="img"
-               image={data.thumbnail}
-               alt={data.title}
+               image={data?.thumbnail ?? ""}
+               loading="lazy"
+               alt={data?.description ?? ""}
                sx={{ height: "100%", objectFit: "cover", borderRadius: 2 }}
             />
             <CardContent>
                <Typography variant="h5" gutterBottom>
-                  {data.title}
+                  {data?.title}
                </Typography>
                <Typography
                   variant="body1"
                   color="text.secondary"
                   sx={{ mb: 2 }}
                >
-                  {data.description}
+                  {data?.description}
                </Typography>
                <Typography variant="h6" color="primary">
-                  ${data.price}
+                  ${data?.price}
                </Typography>
             </CardContent>
          </Card>

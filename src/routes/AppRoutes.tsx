@@ -18,7 +18,7 @@ function AppRoutes({
    setCartCount,
    user,
    setUser,
-}: AppRoutesProps): JSX.Element {
+}: AppRoutesProps): React.JSX.Element {
    return (
       <Routes>
          <Route

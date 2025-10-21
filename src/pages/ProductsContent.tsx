@@ -25,10 +25,14 @@ type ProductsContentProps = {
    user: User | null;
 };
 
+export type ProductInCart = Product & {
+   quatity: number;
+};
+
 function ProductsContent({
    setCartCount,
    user,
-}: ProductsContentProps): JSX.Element {
+}: ProductsContentProps): React.JSX.Element {
    const { data = { products: [] }, isLoading, error } = useGetProductsQuery();
    const { enqueueSnackbar } = useSnackbar();
 
@@ -50,7 +54,7 @@ function ProductsContent({
 
       let updatedCart;
       if (existingItem) {
-         updatedCart = cart.map((item: Product) =>
+         updatedCart = cart.map((item: ProductInCart) =>
             item.id === product.id
                ? { ...item, quatity: item.quatity + 1 }
                : item
@@ -62,7 +66,7 @@ function ProductsContent({
       localStorage.setItem(cartKey, JSON.stringify(updatedCart));
 
       const totalItems = updatedCart.reduce(
-         (sum: number, item: Product) => sum + item.quatity,
+         (sum: number, item: ProductInCart) => sum + item.quatity,
          0
       );
 
@@ -155,7 +159,8 @@ function ProductsContent({
                      <CardMedia
                         component="img"
                         image={product.thumbnail}
-                        alt={product.title}
+                        loading="lazy"
+                        alt={product.description}
                         sx={{
                            aspectRatio: "9 / 10",
                            width: "100%",
