@@ -8,7 +8,7 @@ import type { User } from "../types/user";
 type LoginFormProps = {
    setUser: React.Dispatch<React.SetStateAction<User | null>>;
 };
-function LoginForm({ setUser }: LoginFormProps): JSX.Element {
+function LoginForm({ setUser }: LoginFormProps): React.JSX.Element {
    const [username, setUsername] = useState("");
    const [password, setPassword] = useState("");
    const navigate = useNavigate();
@@ -65,7 +65,9 @@ function LoginForm({ setUser }: LoginFormProps): JSX.Element {
                variant="outlined"
                fullWidth
                value={username}
-               onChange={(e: string) => setUsername(e.target.value)}
+               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setUsername(e.target.value)
+               }
                sx={{ mb: 2 }}
             />
             <TextField
@@ -74,7 +76,9 @@ function LoginForm({ setUser }: LoginFormProps): JSX.Element {
                variant="outlined"
                fullWidth
                value={password}
-               onChange={(e: string) => setPassword(e.target.value)}
+               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setPassword(e.target.value)
+               }
                sx={{ mb: 3 }}
             />
 

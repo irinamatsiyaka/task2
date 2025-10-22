@@ -1,12 +1,13 @@
-import React from "react";
-import PropTypes from "prop-types";
+import React, { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
-import Products from "../pages/Products";
-import ProductDetails from "../pages/ProductDetails";
-import Login from "../pages/Login";
-import Register from "../pages/Register";
-import Cart from "../pages/Cart";
 import type { User } from "../types/user";
+import GradientCircularProgress from "../components/GradientCircularProgress";
+
+const Products = lazy(() => import("../pages/Products"));
+const ProductDetails = lazy(() => import("../pages/ProductDetails"));
+const Login = lazy(() => import("../pages/Login"));
+const Register = lazy(() => import("../pages/Register"));
+const Cart = lazy(() => import("../pages/Cart"));
 
 type AppRoutesProps = {
    setCartCount: React.Dispatch<React.SetStateAction<number>>;
@@ -20,29 +21,27 @@ function AppRoutes({
    setUser,
 }: AppRoutesProps): React.JSX.Element {
    return (
-      <Routes>
-         <Route
-            path="/"
-            element={<Products setCartCount={setCartCount} user={user} />}
-         />
-         <Route path="/login" element={<Login setUser={setUser} />} />
-         <Route path="/register" element={<Register />} />
-         <Route
-            path="/product/:id"
-            element={<ProductDetails setCartCount={setCartCount} user={user} />}
-         />
-         <Route
-            path="/cart"
-            element={<Cart setCartCount={setCartCount} user={user} />}
-         />
-      </Routes>
+      <Suspense fallback={<GradientCircularProgress />}>
+         <Routes>
+            <Route
+               path="/"
+               element={<Products setCartCount={setCartCount} user={user} />}
+            />
+            <Route path="/login" element={<Login setUser={setUser} />} />
+            <Route path="/register" element={<Register />} />
+            <Route
+               path="/product/:id"
+               element={
+                  <ProductDetails setCartCount={setCartCount} user={user} />
+               }
+            />
+            <Route
+               path="/cart"
+               element={<Cart setCartCount={setCartCount} user={user} />}
+            />
+         </Routes>
+      </Suspense>
    );
 }
-
-AppRoutes.propTypes = {
-   setCartCount: PropTypes.func.isRequired,
-   user: PropTypes.object,
-   setUser: PropTypes.func.isRequired,
-};
 
 export default AppRoutes;

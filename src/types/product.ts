@@ -6,3 +6,10 @@ export type Product = {
    image: string;
    thumbnail: string;
 };
+
+export interface ProductsResponse {
+   products: Product[];
+   total: number;
+   skip: number;
+   limit: number;
+}

@@ -13,7 +13,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import AppRoutes from "./routes/AppRoutes";
 import type { User } from "./types/user";
 
-function App(): JSX.Element {
+function App(): React.JSX.Element {
    const [cartCount, setCartCount] = useState<number>(0);
    const [user, setUser] = useState<User | null>(null);
 
@@ -22,9 +22,12 @@ function App(): JSX.Element {
    };
 
    useEffect(() => {
-      const storedUser = JSON.parse(localStorage.getItem("loggedInUser"));
-      const savedCart =
-         JSON.parse(localStorage.getItem(getCartKey(storedUser))) || [];
+      const storedUser = JSON.parse(
+         localStorage.getItem("loggedInUser") || "null"
+      );
+      const savedCart = JSON.parse(
+         localStorage.getItem(getCartKey(storedUser)) || "[]"
+      );
       if (storedUser) setUser(storedUser);
       setCartCount(savedCart.length);
    }, []);

@@ -6,7 +6,7 @@ import { defineConfig } from "eslint/config";
 
 export default defineConfig([
    {
-      files: ["src/**/*.{js,jsx,ts,tsx}"],
+      files: ["src/**/*.{ts,tsx}"],
       languageOptions: {
          parser: tseslint.parser,
          parserOptions: {
@@ -46,6 +46,15 @@ export default defineConfig([
             },
          ],
       },
+   },
+   {
+      files: ["src/**/*.{js,jsx}"],
+      languageOptions: {
+         parserOptions: { ecmaVersion: "latest", sourceType: "module" },
+         globals: globals.browser,
+      },
+      plugins: { react: pluginReact },
+      extends: [js.configs.recommended, pluginReact.configs.flat.recommended],
    },
    {
       files: ["webpack.config.*"],

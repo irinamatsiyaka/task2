@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { useGetProductsQuery } from "../api/productsApi";
@@ -7,18 +7,17 @@ import {
    Grid,
    Card,
    CardContent,
-   CardMedia,
    Typography,
    Button,
    Box,
    Skeleton,
-   IconButton,
 } from "@mui/material";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+
 import PropTypes from "prop-types";
 import { useSnackbar } from "notistack";
 import type { Product } from "../types/product";
 import type { User } from "../types/user";
+import ProductsList from "./ProductsList";
 
 type ProductsContentProps = {
    setCartCount: React.Dispatch<React.SetStateAction<number>>;
@@ -33,7 +32,19 @@ function ProductsContent({
    setCartCount,
    user,
 }: ProductsContentProps): React.JSX.Element {
-   const { data = { products: [] }, isLoading, error } = useGetProductsQuery();
+   const [page, setPage] = useState(1);
+   const limit = 10;
+
+   const handlePageChange = (newPage: number): void => {
+      if (newPage !== page) setPage(newPage);
+   };
+
+   const {
+      data = { products: [], total: 0, limit: 10, skip: 0 },
+      isLoading,
+      isFetching,
+      error,
+   } = useGetProductsQuery(page);
    const { enqueueSnackbar } = useSnackbar();
 
    const handleAddToCart = (
@@ -76,7 +87,7 @@ function ProductsContent({
    if (isLoading) {
       return (
          <Box sx={{ p: 4 }}>
-            <Typography variant="h4" align="center">
+            <Typography variant="h2" align="center" sx={{ mb: 4 }}>
                Loading products...
             </Typography>
             <Grid container spacing={3} justifyContent="center">
@@ -85,14 +96,14 @@ function ProductsContent({
                      <Card
                         sx={{
                            width: 300,
-                           aspectRatio: "3 / 5",
+                           height: 480,
                            borderRadius: 3,
                         }}
                      >
                         <Skeleton
                            variant="rectangular"
                            width="100%"
-                           height={250}
+                           height={320}
                         />
                         <CardContent>
                            <Skeleton variant="text" width="80%" height={30} />
@@ -113,88 +124,30 @@ function ProductsContent({
          <Typography variant="h2" align="center" sx={{ mb: 4 }}>
             Products Catalog
          </Typography>
-         <Grid
-            container
-            spacing={3}
-            justifyContent="center"
-            alignItems="center"
-         >
-            {data.products.map((product: Product) => (
-               <Grid key={product.id}>
-                  <Card
-                     component={Link}
-                     to={`/product/${product.id}`}
-                     sx={{
-                        width: 300,
-                        aspectRatio: "3 / 5",
-                        display: "flex",
-                        flexDirection: "column",
-                        boxShadow: 3,
-                        borderRadius: 3,
-                        textDecoration: "none",
-                        position: "relative",
-                     }}
-                  >
-                     <IconButton
-                        sx={{
-                           position: "absolute",
-                           top: 10,
-                           right: 10,
-                           backgroundColor: "white",
-                           "&:hover": { backgroundColor: "#f5f5f5" },
-                        }}
-                        onClick={(
-                           event: React.MouseEvent<
-                              HTMLButtonElement | HTMLAnchorElement
-                           >
-                        ) => {
-                           event.preventDefault();
 
-                           handleAddToCart(event, product);
-                        }}
-                     >
-                        <ShoppingCartIcon sx={{ color: "#1976d2" }} />
-                     </IconButton>
+         <ProductsList
+            products={data.products}
+            handleAddToCart={handleAddToCart}
+         />
 
-                     <CardMedia
-                        component="img"
-                        image={product.thumbnail}
-                        loading="lazy"
-                        alt={product.description}
-                        sx={{
-                           aspectRatio: "9 / 10",
-                           width: "100%",
-                           objectFit: "cover",
-                           borderRadius: "12px 12px 0 0",
-                        }}
-                     />
-                     <CardContent sx={{ flexGrow: 1 }}>
-                        <Typography
-                           variant="h6"
-                           style={{
-                              textDecoration: "none",
-                              color: "#1976d2",
-                              fontWeight: 500,
-                           }}
-                        >
-                           {product.title}
-                        </Typography>
-                        <Typography
-                           variant="body2"
-                           color="text.secondary"
-                           sx={{ mt: 1 }}
-                        >
-                           ${product.price}
-                        </Typography>
-                     </CardContent>
+         <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+            <Button
+               disabled={page === 1 || isFetching}
+               onClick={() => handlePageChange(page - 1)}
+            >
+               Prev
+            </Button>
 
-                     <Button variant="contained" sx={{ borderRadius: 0 }}>
-                        View details
-                     </Button>
-                  </Card>
-               </Grid>
-            ))}
-         </Grid>
+            <Typography variant="body1" sx={{ alignSelf: "center" }}>
+               Page {page}
+            </Typography>
+            <Button
+               disabled={isFetching || (data?.total ?? 0) <= page * limit}
+               onClick={() => handlePageChange(page + 1)}
+            >
+               Next
+            </Button>
+         </Box>
       </Box>
    );
 }

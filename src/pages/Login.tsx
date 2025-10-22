@@ -8,7 +8,7 @@ type LoginProps = {
    setUser: React.Dispatch<React.SetStateAction<User | null>>;
 };
 
-export default function Login({ setUser }: LoginProps): JSX.Element {
+export default function Login({ setUser }: LoginProps): React.JSX.Element {
    return (
       <SnackbarProvider
          maxSnack={3}

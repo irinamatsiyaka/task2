@@ -12,7 +12,7 @@ type ProductDetailsProps = {
 function ProductDetails({
    setCartCount,
    user,
-}: ProductDetailsProps): JSX.Element {
+}: ProductDetailsProps): React.JSX.Element {
    return (
       <SnackbarProvider
          maxSnack={3}

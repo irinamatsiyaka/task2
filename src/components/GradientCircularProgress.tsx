@@ -1,7 +1,7 @@
 import React from "react";
 import { CircularProgress } from "@mui/material";
 
-export default function GradientCircularProgress(): JSX.Element {
+export default function GradientCircularProgress(): React.JSX.Element {
    return (
       <>
          <svg width={0} height={0}>

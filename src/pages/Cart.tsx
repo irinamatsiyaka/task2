@@ -116,8 +116,8 @@ function Cart({ setCartCount, user }: CartProps): React.JSX.Element {
                         image={item.thumbnail}
                         alt={item.title}
                         sx={{
-                           height: "100%",
                            width: "100%",
+                           height: 320,
                            objectFit: "cover",
                         }}
                      />

@@ -2,7 +2,7 @@ import React from "react";
 import { SnackbarProvider } from "notistack";
 import RegisterForm from "./RegisterForm";
 
-function Register(): JSX.Element {
+function Register(): React.JSX.Element {
    return (
       <SnackbarProvider
          maxSnack={3}

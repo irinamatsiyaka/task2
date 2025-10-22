@@ -11,7 +11,7 @@ module.exports = (env, argv) => {
          path: path.resolve(__dirname, "dist"),
          filename: isDev ? "bundle.js" : "bundle.[contenthash].js",
          clean: true,
-         publicPath: "",
+         publicPath: "/",
       },
       mode: isDev ? "development" : "production",
 
@@ -21,6 +21,7 @@ module.exports = (env, argv) => {
               port: 3002,
               open: true,
               hot: true,
+              historyApiFallback: true,
            }
          : undefined,
 
