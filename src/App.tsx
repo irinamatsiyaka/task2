@@ -72,6 +72,7 @@ function App(): React.JSX.Element {
                      to="/cart"
                      sx={{ color: "white" }}
                      disabled={!user}
+                     aria-label="open shop cart"
                   >
                      <Badge badgeContent={cartCount} color="secondary" showZero>
                         <ShoppingCartIcon />

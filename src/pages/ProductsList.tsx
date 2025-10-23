@@ -43,6 +43,7 @@ function ProductsList({
                   }}
                >
                   <IconButton
+                     aria-label="add to cart"
                      sx={{
                         position: "absolute",
                         top: 10,
