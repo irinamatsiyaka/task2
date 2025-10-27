@@ -11,7 +11,7 @@ module.exports = (env, argv) => {
          path: path.resolve(__dirname, "dist"),
          filename: isDev ? "bundle.js" : "bundle.[contenthash].js",
          clean: true,
-         publicPath: "",
+         publicPath: "/",
       },
       mode: isDev ? "development" : "production",
 
@@ -21,6 +21,7 @@ module.exports = (env, argv) => {
               port: 3002,
               open: true,
               hot: true,
+              historyApiFallback: true,
            }
          : undefined,
 
@@ -43,11 +44,16 @@ module.exports = (env, argv) => {
             { test: /\.css$/, use: ["style-loader", "css-loader"] },
 
             {
-               test: /\.jsx?$/,
+               test: /\.[jt]sx?$/,
                exclude: /node_modules/,
                use: {
                   loader: "babel-loader",
                   options: {
+                     presets: [
+                        "@babel/preset-env",
+                        "@babel/preset-react",
+                        "@babel/preset-typescript",
+                     ],
                      plugins: isDev
                         ? [require.resolve("react-refresh/babel")]
                         : [],
@@ -57,14 +63,14 @@ module.exports = (env, argv) => {
          ],
       },
       resolve: {
-         extensions: [".js", ".jsx"],
+         extensions: [".ts", ".tsx", ".js", ".jsx"],
       },
 
       optimization: isDev
          ? undefined
          : {
               splitChunks: { chunks: "all" },
-              minimize: true, // минификация JS
+              minimize: true,
            },
    };
 };
