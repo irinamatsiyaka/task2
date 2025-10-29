@@ -1,7 +1,7 @@
 import React from "react";
 
 import { SnackbarProvider } from "notistack";
-import ProductDetailsContent from "./ProductDetailsContent";
+import ProductDetailsContent from "../components/products/ProductDetailsContent";
 import type { User } from "../types/user";
 
 type ProductDetailsProps = {
@@ -24,4 +24,4 @@ function ProductDetails({
    );
 }
 
-export default ProductDetails;
+export default React.memo(ProductDetails);

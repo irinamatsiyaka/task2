@@ -1,6 +1,6 @@
 import React from "react";
 import { SnackbarProvider } from "notistack";
-import ProductsContent from "./ProductsContent";
+import ProductsContent from "../components/products/ProductsContent";
 import type { User } from "../types/user";
 
 type ProductsProps = {
@@ -19,4 +19,4 @@ function Products({ setCartCount, user }: ProductsProps): React.JSX.Element {
    );
 }
 
-export default Products;
+export default React.memo(Products);

@@ -1,16 +1,18 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import {
-   Grid,
    Card,
    CardContent,
    CardMedia,
    Typography,
-   Button,
    IconButton,
 } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import type { Product } from "../types/product";
+import type { Product } from "../../types/product";
+
+import Grid from "@mui/material/Grid";
+
+import ROUTES from "../../constants/routes";
 
 type ProductsListProps = {
    products: Product[];
@@ -30,10 +32,10 @@ function ProductsList({
             <Grid key={product.id}>
                <Card
                   component={Link}
-                  to={`/product/${product.id}`}
+                  to={ROUTES.PRODUCT.replace(":id", String(product.id))}
                   sx={{
                      width: 300,
-                     height: 480,
+                     height: 460,
                      display: "flex",
                      flexDirection: "column",
                      boxShadow: 3,
@@ -67,7 +69,6 @@ function ProductsList({
                      component="img"
                      image={product.thumbnail}
                      alt={product.description}
-                     loading={index === 0 ? "eager" : "lazy"}
                      fetchPriority={index === 0 ? "high" : "auto"}
                      sx={{
                         width: "100%",
@@ -98,10 +99,6 @@ function ProductsList({
                         ${product.price}
                      </Typography>
                   </CardContent>
-
-                  <Button variant="contained" sx={{ borderRadius: 0 }}>
-                     View details
-                  </Button>
                </Card>
             </Grid>
          ))}

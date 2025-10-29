@@ -15,6 +15,7 @@ export const productsApi = createApi({
             const skip = (page - 1) * 10;
             return `${PRODUCTS_ENDPOINT}?limit=${limit}&skip=${skip}`;
          },
+         keepUnusedDataFor: 300,
       }),
       getProductById: build.query<Product, string | number>({
          query: (id: string | number) => `${PRODUCTS_ENDPOINT}/${id}`,

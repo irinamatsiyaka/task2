@@ -23,7 +23,7 @@
       "removeComments": true,
 
       "noUncheckedIndexedAccess": true,
-      "exactOptionalPropertyTypes": true
+      "exactOptionalPropertyTypes": false
       // "allowJs": true,
       // "checkJs": true
    },
