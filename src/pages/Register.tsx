@@ -1,6 +1,6 @@
 import React from "react";
 import { SnackbarProvider } from "notistack";
-import RegisterForm from "./RegisterForm";
+import RegisterForm from "../components/auth/RegisterForm";
 
 function Register(): React.JSX.Element {
    return (

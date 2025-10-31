@@ -2,45 +2,51 @@ import React, { useState } from "react";
 import { Box, TextField, Button, Typography, Paper, Link } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
+import type { User, AuthUser } from "../../types/user";
+import ROUTES from "../../constants/routes";
 
-function RegisterForm(): React.JSX.Element {
+type LoginFormProps = {
+   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+};
+function LoginForm({ setUser }: LoginFormProps): React.JSX.Element {
    const [username, setUsername] = useState("");
    const [password, setPassword] = useState("");
    const navigate = useNavigate();
 
    const { enqueueSnackbar } = useSnackbar();
 
-   const handleRegister = (): void => {
-      if (username.trim() && password.trim()) {
-         const users = JSON.parse(
-            localStorage.getItem("registeredUsers") || "[]"
-         );
-
-         const existingUser = users.find(
-            (u: { username: string }) => u.username === username
-         );
-         if (existingUser) {
-            enqueueSnackbar("This username is already taken!", {
-               variant: "error",
-            });
-            return;
-         }
-
-         const newUser = {
-            id: users.length + 1,
-            username,
-            password,
-         };
-         const updatedUsers = [...users, newUser];
-         localStorage.setItem("registeredUsers", JSON.stringify(updatedUsers));
-         enqueueSnackbar("Registration successful!", { variant: "success" });
-
-         setTimeout(() => {
-            navigate("/login");
-         }, 1500);
-      } else {
-         enqueueSnackbar("Please fill in all fields!", { variant: "warning" });
+   const handleLogin = (): void => {
+      let users: AuthUser[] = [];
+      try {
+         users = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
+      } catch {
+         users = [];
       }
+
+      const storedUser = users.find(
+         (u: { username: string; password: string }) =>
+            u.username === username && u.password === password
+      );
+
+      if (!storedUser) {
+         enqueueSnackbar("Invalid username or password", { variant: "error" });
+         return;
+      }
+
+      const appUser: User = {
+         id: Date.now(),
+         username: storedUser.username,
+         name: storedUser.name,
+      };
+
+      localStorage.setItem("loggedInUser", JSON.stringify(appUser));
+      setUser(appUser);
+
+      enqueueSnackbar("Login successful!", { variant: "success" });
+
+      setTimeout(() => {
+         navigate(ROUTES.HOME, { replace: true });
+      }, 1500);
    };
 
    return (
@@ -62,7 +68,7 @@ function RegisterForm(): React.JSX.Element {
             }}
          >
             <Typography variant="h5" gutterBottom>
-               Register
+               Login
             </Typography>
 
             <TextField
@@ -70,20 +76,19 @@ function RegisterForm(): React.JSX.Element {
                variant="outlined"
                fullWidth
                value={username}
-               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                  setUsername(event.target.value)
+               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setUsername(e.target.value)
                }
                sx={{ mb: 2 }}
             />
-
             <TextField
                label="Password"
                type="password"
                variant="outlined"
                fullWidth
                value={password}
-               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                  setPassword(event.target.value)
+               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setPassword(e.target.value)
                }
                sx={{ mb: 3 }}
             />
@@ -92,20 +97,20 @@ function RegisterForm(): React.JSX.Element {
                variant="contained"
                color="primary"
                fullWidth
-               onClick={handleRegister}
+               onClick={handleLogin}
             >
-               Register
+               Login
             </Button>
 
             <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-               Already have an account?{" "}
+               Don’t have an account?{" "}
                <Link
                   component="button"
                   variant="body2"
                   sx={{ color: "gray", textDecoration: "underline" }}
-                  onClick={() => navigate("/login")}
+                  onClick={() => navigate(ROUTES.REGISTER)}
                >
-                  Login
+                  Register
                </Link>
             </Typography>
          </Paper>
@@ -113,4 +118,4 @@ function RegisterForm(): React.JSX.Element {
    );
 }
 
-export default RegisterForm;
+export default LoginForm;

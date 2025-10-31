@@ -9,13 +9,14 @@ import {
    Button,
    Grid,
 } from "@mui/material";
+
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import type { User } from "../types/user";
 import type { Product } from "../types/product";
 
 export type ProductInCart = Product & {
-   quatity: number;
+   quantity: number;
 };
 
 export type CartProps = {
@@ -26,50 +27,59 @@ export type CartProps = {
 function Cart({ setCartCount, user }: CartProps): React.JSX.Element {
    const [cartItems, setCartItems] = useState<ProductInCart[]>([]);
 
-   const getCartKey = (): string => {
-      return user ? `cart_user_${user.id}` : "cart_guest";
-   };
+   const cartKey = React.useMemo(
+      () => (user ? `cart_user_${user.id}` : "cart_guest"),
+      [user]
+   );
 
    useEffect(() => {
-      const savedCart = JSON.parse(localStorage.getItem(getCartKey()) || "[]");
-      setCartItems(savedCart);
-   }, [user]);
+      try {
+         const raw = localStorage.getItem(cartKey);
+         const parsed = raw ? JSON.parse(raw) : [];
+         setCartItems(Array.isArray(parsed) ? parsed : []);
+      } catch {
+         setCartItems([]);
+      }
+   }, [cartKey]);
 
    useEffect(() => {
-      localStorage.setItem(getCartKey(), JSON.stringify(cartItems));
+      localStorage.setItem(cartKey, JSON.stringify(cartItems));
       const total = cartItems.reduce(
-         (sum: number, item: ProductInCart) => sum + item.quatity,
+         (sum: number, item: ProductInCart) => sum + item.quantity,
          0
       );
       setCartCount(total);
-   }, [cartItems, setCartCount]);
+   }, [cartItems, cartKey, setCartCount]);
 
    const handleIncrease = (id: number): void => {
-      const updated = cartItems.map((item: ProductInCart) =>
-         item.id === id ? { ...item, quatity: item.quatity + 1 } : item
+      setCartItems((prev: ProductInCart[]): ProductInCart[] =>
+         prev.map(
+            (it: ProductInCart): ProductInCart =>
+               it.id === id ? { ...it, quantity: it.quantity + 1 } : it
+         )
       );
-
-      setCartItems(updated);
-      localStorage.setItem(getCartKey(), JSON.stringify(updated));
    };
 
    const handleDecrease = (id: number): void => {
-      const updated = cartItems
-         .map((item: ProductInCart) =>
-            item.id === id ? { ...item, quatity: item.quatity - 1 } : item
-         )
-         .filter((item: ProductInCart) => item.quatity > 0);
-      setCartItems(updated);
-      localStorage.setItem(getCartKey(), JSON.stringify(updated));
+      setCartItems((prev: ProductInCart[]): ProductInCart[] =>
+         prev
+            .map(
+               (it: ProductInCart): ProductInCart =>
+                  it.id === id
+                     ? { ...it, quantity: Math.max(0, it.quantity - 1) }
+                     : it
+            )
+            .filter((it: ProductInCart): boolean => it.quantity > 0)
+      );
    };
 
    const handleClearCart = (): void => {
+      localStorage.removeItem(cartKey);
       setCartItems([]);
-      localStorage.removeItem(getCartKey());
    };
 
    const totalPrice = cartItems.reduce(
-      (sum: number, item: ProductInCart) => sum + item.price * item.quatity,
+      (sum: number, item: ProductInCart) => sum + item.price * item.quantity,
       0
    );
 
@@ -101,20 +111,23 @@ function Cart({ setCartCount, user }: CartProps): React.JSX.Element {
 
          <Grid container spacing={3} justifyContent="center">
             {cartItems.map((item: ProductInCart) => (
-               <Grid key={item.id}>
+               <Grid component="div" key={item.id}>
                   <Card
                      sx={{
-                        width: 300,
+                        width: 320,
                         aspectRatio: "3 / 5",
                         display: "flex",
                         flexDirection: "column",
                         boxShadow: 3,
+                        position: "relative",
+                        overflow: "visible",
                      }}
                   >
                      <CardMedia
                         component="img"
                         image={item.thumbnail}
                         alt={item.title}
+                        loading="lazy"
                         sx={{
                            width: "100%",
                            height: 320,
@@ -143,19 +156,19 @@ function Cart({ setCartCount, user }: CartProps): React.JSX.Element {
                            </IconButton>
 
                            <Typography sx={{ mx: 2 }}>
-                              {item.quatity}
+                              {item.quantity}
                            </Typography>
 
                            <IconButton
                               color="primary"
                               onClick={() => handleIncrease(item.id)}
                            >
-                              <AddIcon />
+                              <AddIcon fontSize="small" />
                            </IconButton>
                         </Box>
 
                         <Typography color="text.primary" sx={{ mt: 1 }}>
-                           Total: ${(item.price * item.quatity).toFixed(2)}
+                           Total: ${(item.price * item.quantity).toFixed(2)}
                         </Typography>
                      </CardContent>
                   </Card>

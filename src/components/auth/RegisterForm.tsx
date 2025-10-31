@@ -1,41 +1,53 @@
 import React, { useState } from "react";
 import { Box, TextField, Button, Typography, Paper, Link } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import PropTypes from "prop-types";
 import { useSnackbar } from "notistack";
-import type { User } from "../types/user";
 
-type LoginFormProps = {
-   setUser: React.Dispatch<React.SetStateAction<User | null>>;
-};
-function LoginForm({ setUser }: LoginFormProps): React.JSX.Element {
+function RegisterForm(): React.JSX.Element {
    const [username, setUsername] = useState("");
    const [password, setPassword] = useState("");
    const navigate = useNavigate();
 
    const { enqueueSnackbar } = useSnackbar();
 
-   const handleLogin = (): void => {
-      const users = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
+   const handleRegister = (): void => {
+      if (username.trim() && password.trim()) {
+         let users: { id: number; username: string; password: string }[] = [];
 
-      const storedUser = users.find(
-         (u: { username: string; password: string }) =>
-            u.username === username && u.password === password
-      );
+         try {
+            users = JSON.parse(
+               localStorage.getItem("registeredUsers") || "[]"
+            );
+         } catch {
+            console.warn("Corrupted users data, resetting to empty array");
+            users = [];
+         }
 
-      if (!storedUser) {
-         enqueueSnackbar("Invalid username or password", { variant: "error" });
-         return;
+         const existingUser = users.find(
+            (u: { username: string }) => u.username === username
+         );
+         if (existingUser) {
+            enqueueSnackbar("This username is already taken!", {
+               variant: "error",
+            });
+            return;
+         }
+
+         const newUser = {
+            id: users.length + 1,
+            username,
+            password,
+         };
+         const updatedUsers = [...users, newUser];
+         localStorage.setItem("registeredUsers", JSON.stringify(updatedUsers));
+         enqueueSnackbar("Registration successful!", { variant: "success" });
+
+         setTimeout(() => {
+            navigate("/login");
+         }, 1500);
+      } else {
+         enqueueSnackbar("Please fill in all fields!", { variant: "warning" });
       }
-
-      localStorage.setItem("loggedInUser", JSON.stringify(storedUser));
-      setUser(storedUser);
-
-      enqueueSnackbar("Login successful!", { variant: "success" });
-
-      setTimeout(() => {
-         navigate("/");
-      }, 1500);
    };
 
    return (
@@ -57,7 +69,7 @@ function LoginForm({ setUser }: LoginFormProps): React.JSX.Element {
             }}
          >
             <Typography variant="h5" gutterBottom>
-               Login
+               Register
             </Typography>
 
             <TextField
@@ -65,19 +77,20 @@ function LoginForm({ setUser }: LoginFormProps): React.JSX.Element {
                variant="outlined"
                fullWidth
                value={username}
-               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setUsername(e.target.value)
+               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                  setUsername(event.target.value)
                }
                sx={{ mb: 2 }}
             />
+
             <TextField
                label="Password"
                type="password"
                variant="outlined"
                fullWidth
                value={password}
-               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setPassword(e.target.value)
+               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                  setPassword(event.target.value)
                }
                sx={{ mb: 3 }}
             />
@@ -86,20 +99,20 @@ function LoginForm({ setUser }: LoginFormProps): React.JSX.Element {
                variant="contained"
                color="primary"
                fullWidth
-               onClick={handleLogin}
+               onClick={handleRegister}
             >
-               Login
+               Register
             </Button>
 
             <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-               Don’t have an account?{" "}
+               Already have an account?{" "}
                <Link
                   component="button"
                   variant="body2"
                   sx={{ color: "gray", textDecoration: "underline" }}
-                  onClick={() => navigate("/register")}
+                  onClick={() => navigate("/login")}
                >
-                  Register
+                  Login
                </Link>
             </Typography>
          </Paper>
@@ -107,8 +120,4 @@ function LoginForm({ setUser }: LoginFormProps): React.JSX.Element {
    );
 }
 
-LoginForm.propTypes = {
-   setUser: PropTypes.func.isRequired,
-};
-
-export default LoginForm;
+export default RegisterForm;

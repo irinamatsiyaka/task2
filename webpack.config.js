@@ -1,6 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = (env, argv) => {
    const isDev = argv.mode === "development";
@@ -17,7 +18,10 @@ module.exports = (env, argv) => {
 
       devServer: isDev
          ? {
-              static: "./dist",
+              static: [
+                 { directory: path.resolve(__dirname, "public") },
+                 { directory: path.resolve(__dirname, "dist") },
+              ],
               port: 3002,
               open: true,
               hot: true,
@@ -38,6 +42,9 @@ module.exports = (env, argv) => {
                  },
          }),
          ...(isDev ? [new ReactRefreshWebpackPlugin()] : []),
+         new CopyWebpackPlugin({
+            patterns: [{ from: "public/sw.js", to: "sw.js" }],
+         }),
       ],
       module: {
          rules: [

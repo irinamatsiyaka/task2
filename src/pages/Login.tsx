@@ -1,6 +1,6 @@
 import React from "react";
 import { SnackbarProvider } from "notistack";
-import LoginForm from "./LoginForm";
+import LoginForm from "../components/auth/LoginForm";
 
 import type { User } from "../types/user";
 
