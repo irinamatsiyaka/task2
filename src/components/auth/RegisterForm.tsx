@@ -15,11 +15,8 @@ function RegisterForm(): React.JSX.Element {
          let users: { id: number; username: string; password: string }[] = [];
 
          try {
-            users = JSON.parse(
-               localStorage.getItem("registeredUsers") || "[]"
-            );
+            users = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
          } catch {
-            console.warn("Corrupted users data, resetting to empty array");
             users = [];
          }
 

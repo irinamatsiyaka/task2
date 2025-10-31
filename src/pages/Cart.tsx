@@ -54,8 +54,10 @@ function Cart({ setCartCount, user }: CartProps): React.JSX.Element {
    const handleIncrease = (id: number): void => {
       setCartItems((prev: ProductInCart[]): ProductInCart[] =>
          prev.map(
-            (it: ProductInCart): ProductInCart =>
-               it.id === id ? { ...it, quantity: it.quantity + 1 } : it
+            (cardItem: ProductInCart): ProductInCart =>
+               cardItem.id === id
+                  ? { ...cardItem, quantity: cardItem.quantity + 1 }
+                  : cardItem
          )
       );
    };
@@ -64,12 +66,15 @@ function Cart({ setCartCount, user }: CartProps): React.JSX.Element {
       setCartItems((prev: ProductInCart[]): ProductInCart[] =>
          prev
             .map(
-               (it: ProductInCart): ProductInCart =>
-                  it.id === id
-                     ? { ...it, quantity: Math.max(0, it.quantity - 1) }
-                     : it
+               (cardItem: ProductInCart): ProductInCart =>
+                  cardItem.id === id
+                     ? {
+                          ...cardItem,
+                          quantity: Math.max(0, cardItem.quantity - 1),
+                       }
+                     : cardItem
             )
-            .filter((it: ProductInCart): boolean => it.quantity > 0)
+            .filter((cardItem: ProductInCart): boolean => cardItem.quantity > 0)
       );
    };
 
