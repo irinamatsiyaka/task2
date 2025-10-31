@@ -55,7 +55,6 @@ function ProductDetailsContent({
             const raw = localStorage.getItem(cartKey);
             cart = raw ? (JSON.parse(raw) as ProductInCart[]) : [];
          } catch {
-            console.warn(`Invalid cart data for key "${cartKey}"`);
             cart = [];
          }
          const existingItem = cart.some(

@@ -75,7 +75,6 @@ function ProductsContent({
             const raw = localStorage.getItem(cartKey);
             cart = raw ? (JSON.parse(raw) as ProductInCart[]) : [];
          } catch {
-            console.warn(`Invalid cart data for key "${cartKey}"`);
             cart = [];
          }
          const existingItem = cart.find(
@@ -140,8 +139,8 @@ function ProductsContent({
 
    if (error) return <p>Error loading products</p>;
 
-   const totalPages = Math.max(
-      1,
+   const totalPages = Math.min(
+      20,
       Math.ceil((data.total || 0) / (data.limit || 10))
    );
 
